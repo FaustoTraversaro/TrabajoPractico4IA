@@ -1,0 +1,38 @@
+import cv2
+import numpy as np
+
+# Leer la imagen
+img = cv2.imread('Motor2.jpeg', cv2.IMREAD_COLOR)
+
+# Mostrar la imagen original
+cv2.imshow('Original', img)
+cv2.waitKey(0)
+
+# Convertir a escala de grises
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+cv2.imshow('Gris', gray)
+cv2.waitKey(0)
+
+# Aplicar desenfoque
+gray_blurred = cv2.blur(gray, (9, 9))
+cv2.imshow('Borrosa', gray_blurred)
+cv2.waitKey(0)
+
+# Detectar círculos usando HoughCircles
+detected_circles = cv2.HoughCircles(gray_blurred, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=1, maxRadius=40)
+
+# Si se detectan círculos, dibujarlos
+if detected_circles is not None:
+    detected_circles = np.uint16(np.around(detected_circles))
+    for pt in detected_circles[0, :]:
+        a, b, r = pt[0], pt[1], pt[2]
+        cv2.circle(img, (a, b), r, (0, 255, 0), 2)  # Dibujar circunferencia
+        print("Centro ({:}, {:}), radio = {}".format(a, b, r))
+        cv2.circle(img, (a, b), 1, (0, 0, 255), 3)  # Dibujar centro
+
+# Mostrar la imagen con los círculos detectados
+cv2.imshow('Circunferencias detectadas', img)
+cv2.waitKey(0)
+
+# Cerrar todas las ventanas
+cv2.destroyAllWindows()
